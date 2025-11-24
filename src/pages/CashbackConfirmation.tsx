@@ -1,14 +1,26 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { CheckCircle, TrendingUp, X } from 'lucide-react';
 
+interface LocationState {
+  merchant?: string;
+  amount?: number;
+  cashback?: number;
+}
+
 const CashbackConfirmation: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { hasInvested, showCashbackPrompt, onboardingComplete, setShowCashbackPrompt, dismissPrompt } = useAppContext();
 
-  const cashbackAmount = 5.0;
+  const { merchant = 'Coffee Bean Cafe', cashback = 5.0 } = (location.state as LocationState) || {};
+  const cashbackAmount = cashback;
   const shouldShowPrompt = !hasInvested && showCashbackPrompt;
+
+  const currentDate = new Date();
+  const formattedDate = currentDate.toLocaleDateString('en-MY', { month: 'short', day: 'numeric', year: 'numeric' });
+  const formattedTime = currentDate.toLocaleTimeString('en-MY', { hour: 'numeric', minute: '2-digit', hour12: true });
 
   const handleInvestClick = () => {
     if (!onboardingComplete) {
@@ -37,15 +49,15 @@ const CashbackConfirmation: React.FC = () => {
         <div className="bg-gray-50 rounded-lg p-4 mb-6">
           <div className="flex justify-between text-sm mb-2">
             <span className="text-gray-600">Merchant</span>
-            <span className="font-medium text-gray-900">Coffee Bean Cafe</span>
+            <span className="font-medium text-gray-900">{merchant}</span>
           </div>
           <div className="flex justify-between text-sm mb-2">
             <span className="text-gray-600">Date</span>
-            <span className="font-medium text-gray-900">Nov 24, 2025</span>
+            <span className="font-medium text-gray-900">{formattedDate}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Time</span>
-            <span className="font-medium text-gray-900">2:30 PM</span>
+            <span className="font-medium text-gray-900">{formattedTime}</span>
           </div>
         </div>
 

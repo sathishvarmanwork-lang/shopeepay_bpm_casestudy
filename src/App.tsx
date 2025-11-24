@@ -4,6 +4,7 @@ import { AppProvider } from './context/AppContext';
 import Dashboard from './pages/Dashboard';
 import WalletPage from './pages/WalletPage';
 import SearchResults from './pages/SearchResults';
+import MerchantPayment from './pages/MerchantPayment';
 import CashbackConfirmation from './pages/CashbackConfirmation';
 import InvestLanding from './pages/InvestLanding';
 import InvestOnboarding from './pages/InvestOnboarding';
@@ -21,6 +22,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/wallet-page" element={<WalletPage />} />
           <Route path="/search-results" element={<SearchResults />} />
+          <Route path="/merchant-payment" element={<MerchantPayment />} />
           <Route path="/cashback-confirmation" element={<CashbackConfirmation />} />
           <Route path="/invest-landing" element={<InvestLanding />} />
           <Route path="/invest-onboarding" element={<InvestOnboarding />} />

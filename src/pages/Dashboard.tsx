@@ -4,7 +4,7 @@ import { useAppContext } from '../context/AppContext';
 import {
   User, CreditCard, ArrowRightLeft, DollarSign,
   Gift, Coins, Shield, Car, Wallet, FileText,
-  History, UserCircle, Bell, Search
+  History, UserCircle, Bell, Search, ChevronRight
 } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
@@ -19,23 +19,29 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleProductClick = (label: string) => {
+    if (label === 'Pay') {
+      navigate('/search-results');
+    }
+  };
+
   const products = [
-    { icon: CreditCard, label: 'Top up', color: 'bg-blue-50' },
-    { icon: DollarSign, label: 'Pay', color: 'bg-green-50' },
-    { icon: ArrowRightLeft, label: 'Transfer', color: 'bg-purple-50' },
-    { icon: Wallet, label: 'Request for cash', color: 'bg-yellow-50' },
-    { icon: Gift, label: 'E-voucher', color: 'bg-pink-50' },
-    { icon: Gift, label: 'Free voucher', color: 'bg-red-50' },
-    { icon: Coins, label: 'Free coins daily', color: 'bg-orange-50' },
-    { icon: ArrowRightLeft, label: 'Overseas transfer', color: 'bg-indigo-50' },
-    { icon: Shield, label: 'Insurance', color: 'bg-teal-50' },
-    { icon: Car, label: 'Car insurance', color: 'bg-cyan-50' },
-    { icon: CreditCard, label: 'SPayLater', color: 'bg-violet-50' },
-    { icon: Gift, label: 'Welcome bonus', color: 'bg-lime-50' },
-    { icon: FileText, label: 'Finance', color: 'bg-emerald-50' },
-    { icon: Search, label: 'Scan & Pay', color: 'bg-sky-50' },
-    { icon: History, label: 'History', color: 'bg-slate-50' },
-    { icon: UserCircle, label: 'Profile/Me', color: 'bg-stone-50' },
+    { icon: CreditCard, label: 'Top up', color: 'bg-blue-50', clickable: false },
+    { icon: DollarSign, label: 'Pay', color: 'bg-green-50', clickable: true },
+    { icon: ArrowRightLeft, label: 'Transfer', color: 'bg-purple-50', clickable: false },
+    { icon: Wallet, label: 'Request for cash', color: 'bg-yellow-50', clickable: false },
+    { icon: Gift, label: 'E-voucher', color: 'bg-pink-50', clickable: false },
+    { icon: Gift, label: 'Free voucher', color: 'bg-red-50', clickable: false },
+    { icon: Coins, label: 'Free coins daily', color: 'bg-orange-50', clickable: false },
+    { icon: ArrowRightLeft, label: 'Overseas transfer', color: 'bg-indigo-50', clickable: false },
+    { icon: Shield, label: 'Insurance', color: 'bg-teal-50', clickable: false },
+    { icon: Car, label: 'Car insurance', color: 'bg-cyan-50', clickable: false },
+    { icon: CreditCard, label: 'SPayLater', color: 'bg-violet-50', clickable: false },
+    { icon: Gift, label: 'Welcome bonus', color: 'bg-lime-50', clickable: false },
+    { icon: FileText, label: 'Finance', color: 'bg-emerald-50', clickable: false },
+    { icon: Search, label: 'Scan & Pay', color: 'bg-sky-50', clickable: false },
+    { icon: History, label: 'History', color: 'bg-slate-50', clickable: false },
+    { icon: UserCircle, label: 'Profile/Me', color: 'bg-stone-50', clickable: false },
   ];
 
   return (
@@ -52,10 +58,19 @@ const Dashboard: React.FC = () => {
 
       <div className="max-w-md mx-auto pb-20">
         <div className="bg-[#EE4D2D] px-4 pb-6">
-          <div className="text-white">
-            <p className="text-sm opacity-90 mb-1">Wallet Balance</p>
-            <p className="text-3xl font-bold">RM {walletBalance.toFixed(2)}</p>
-          </div>
+          <button
+            onClick={() => navigate('/wallet-page')}
+            className="w-full text-left text-white hover:bg-[#D43D1D] active:bg-[#C0351A] transition-colors rounded-lg px-4 py-3 -mx-4 cursor-pointer"
+            style={{ minHeight: '44px' }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm opacity-90 mb-1">Wallet Balance</p>
+                <p className="text-3xl font-bold">RM {walletBalance.toFixed(2)}</p>
+              </div>
+              <ChevronRight className="w-6 h-6 opacity-70" />
+            </div>
+          </button>
         </div>
 
         <div className="px-4 -mt-4">
@@ -103,8 +118,14 @@ const Dashboard: React.FC = () => {
 
           <div className="grid grid-cols-4 gap-4 mb-6">
             {products.map((product, index) => (
-              <div key={index} className="flex flex-col items-center">
-                <div className={`${product.color} w-16 h-16 rounded-lg flex items-center justify-center mb-2 shadow-sm`}>
+              <div
+                key={index}
+                className={`flex flex-col items-center ${product.clickable ? 'cursor-pointer' : ''}`}
+                onClick={() => product.clickable && handleProductClick(product.label)}
+              >
+                <div className={`${product.color} w-16 h-16 rounded-lg flex items-center justify-center mb-2 shadow-sm ${
+                  product.clickable ? 'hover:scale-105 transition-transform' : ''
+                }`}>
                   <product.icon className="w-7 h-7 text-gray-700" />
                 </div>
                 <p className="text-xs text-gray-700 text-center leading-tight">{product.label}</p>

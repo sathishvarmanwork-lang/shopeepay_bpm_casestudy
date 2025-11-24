@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { ArrowLeft, Search, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Search, TrendingUp, Coffee, ShoppingBag, Utensils, Store, Percent } from 'lucide-react';
 
 const SearchResults: React.FC = () => {
   const navigate = useNavigate();
@@ -33,6 +33,13 @@ const SearchResults: React.FC = () => {
 
   const recentSearches = ['Top up', 'Insurance', 'Transfer money', 'Vouchers'];
 
+  const cashbackMerchants = [
+    { name: 'Coffee Bean Cafe', category: 'Coffee & Beverages', icon: Coffee, cashback: 5, color: 'bg-amber-50' },
+    { name: 'MegaMart Supermarket', category: 'Groceries & Shopping', icon: ShoppingBag, cashback: 3, color: 'bg-blue-50' },
+    { name: 'Noodle House Restaurant', category: 'Dining & Food', icon: Utensils, cashback: 8, color: 'bg-orange-50' },
+    { name: 'Fashion Avenue Store', category: 'Retail & Fashion', icon: Store, cashback: 4, color: 'bg-pink-50' },
+  ];
+
   const services = [
     { name: 'Top up Wallet', category: 'Wallet Services' },
     { name: 'Pay Bills', category: 'Payments' },
@@ -40,6 +47,10 @@ const SearchResults: React.FC = () => {
     { name: 'Buy Insurance', category: 'Insurance' },
     { name: 'E-vouchers', category: 'Rewards' },
   ];
+
+  const handleMerchantClick = (merchant: typeof cashbackMerchants[0]) => {
+    navigate('/merchant-payment', { state: { merchant } });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -107,6 +118,34 @@ const SearchResults: React.FC = () => {
             </div>
           </div>
         )}
+
+        <div className="mb-6">
+          <h2 className="text-sm font-semibold text-gray-700 mb-3">Cashback Merchants</h2>
+          <div className="space-y-3">
+            {cashbackMerchants.map((merchant, index) => (
+              <button
+                key={index}
+                onClick={() => handleMerchantClick(merchant)}
+                className="w-full bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-all cursor-pointer border border-transparent hover:border-[#EE4D2D] text-left"
+                style={{ minHeight: '44px' }}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`${merchant.color} w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0`}>
+                    <merchant.icon className="w-6 h-6 text-gray-700" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900">{merchant.name}</p>
+                    <p className="text-xs text-gray-500 mt-1">{merchant.category}</p>
+                  </div>
+                  <div className="flex items-center gap-1 bg-green-50 px-2 py-1 rounded">
+                    <Percent className="w-3 h-3 text-green-600" />
+                    <span className="text-xs font-semibold text-green-600">{merchant.cashback}%</span>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
 
         <div>
           <h2 className="text-sm font-semibold text-gray-700 mb-3">
