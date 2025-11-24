@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { ArrowLeft, Wallet, CreditCard, Banknote, Gift } from 'lucide-react';
+import { ArrowLeft, Wallet, CreditCard, Banknote, Gift, Coffee } from 'lucide-react';
 
 interface LocationState {
   merchant: {
@@ -19,7 +19,7 @@ const MerchantPayment: React.FC = () => {
   const { walletBalance, setWalletBalance } = useAppContext();
 
   const { merchant } = (location.state as LocationState) || {
-    merchant: { name: 'Coffee Bean Cafe', category: 'Coffee & Beverages', cashback: 5, color: 'bg-amber-50' }
+    merchant: { name: 'Coffee Bean Cafe', category: 'Coffee & Beverages', cashback: 5, color: 'bg-amber-50', icon: Coffee }
   };
 
   const [amount, setAmount] = useState('');
