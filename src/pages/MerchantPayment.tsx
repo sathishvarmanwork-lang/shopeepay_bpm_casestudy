@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { ArrowLeft, Wallet, CreditCard, Banknote, Gift, Coffee } from 'lucide-react';
+import { ArrowLeft, Wallet, CreditCard, Banknote, Gift, Coffee, ShoppingBag, Utensils, Store } from 'lucide-react';
 
 interface LocationState {
   merchant: {
     name: string;
     category: string;
     cashback: number;
-    icon: React.ComponentType<{ className?: string }>;
     color: string;
   };
 }
@@ -19,8 +18,18 @@ const MerchantPayment: React.FC = () => {
   const { walletBalance, setWalletBalance } = useAppContext();
 
   const { merchant } = (location.state as LocationState) || {
-    merchant: { name: 'Coffee Bean Cafe', category: 'Coffee & Beverages', cashback: 5, color: 'bg-amber-50', icon: Coffee }
+    merchant: { name: 'Coffee Bean Cafe', category: 'Coffee & Beverages', cashback: 5, color: 'bg-amber-50' }
   };
+
+  const getMerchantIcon = (category: string) => {
+    if (category.includes('Coffee') || category.includes('Beverage')) return Coffee;
+    if (category.includes('Groceries') || category.includes('Shopping')) return ShoppingBag;
+    if (category.includes('Dining') || category.includes('Food') || category.includes('Restaurant')) return Utensils;
+    if (category.includes('Retail') || category.includes('Fashion') || category.includes('Store')) return Store;
+    return Store;
+  };
+
+  const MerchantIcon = getMerchantIcon(merchant.category);
 
   const [amount, setAmount] = useState('');
   const [selectedPayment, setSelectedPayment] = useState<'wallet' | 'card'>('wallet');
@@ -66,7 +75,7 @@ const MerchantPayment: React.FC = () => {
         <div className="bg-white rounded-lg shadow-sm p-5 mb-4">
           <div className="flex items-center gap-3 mb-4">
             <div className={`${merchant.color} w-14 h-14 rounded-lg flex items-center justify-center flex-shrink-0`}>
-              {merchant.icon && <merchant.icon className="w-7 h-7 text-gray-700" />}
+              <MerchantIcon className="w-7 h-7 text-gray-700" />
             </div>
             <div className="flex-1">
               <h2 className="font-semibold text-gray-900">{merchant.name}</h2>

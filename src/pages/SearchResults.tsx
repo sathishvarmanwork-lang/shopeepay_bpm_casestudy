@@ -49,13 +49,8 @@ const SearchResults: React.FC = () => {
   ];
 
   const handleMerchantClick = (merchant: typeof cashbackMerchants[0]) => {
-    console.log('Merchant clicked:', merchant);
-    console.log('Navigating to /merchant-payment');
-    try {
-      navigate('/merchant-payment', { state: { merchant } });
-    } catch (error) {
-      console.error('Navigation error:', error);
-    }
+    const { icon, ...merchantData } = merchant;
+    navigate('/merchant-payment', { state: { merchant: merchantData } });
   };
 
   return (
