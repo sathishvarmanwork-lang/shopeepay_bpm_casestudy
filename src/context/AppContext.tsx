@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { AppState, User, Fund, RiskProfile, PersonalInfo } from '../types';
+import { AppState, User, Fund, RiskProfile, PersonalInfo, SupportMessage } from '../types';
 
 interface AppContextType extends AppState {
   setUser: (user: User | null) => void;
@@ -13,7 +13,7 @@ interface AppContextType extends AppState {
   setOnboardingStep: (step: number) => void;
   setRiskProfile: (profile: RiskProfile) => void;
   setInvestmentPreferences: (preferences: string[]) => void;
-  setBankVerificationStatus: (status: 'pending' | 'success' | 'failed') => void;
+  setBankVerificationStatus: (status: 'pending' | 'success' | 'failed' | 'manual-review') => void;
   setPersonalInfo: (info: PersonalInfo) => void;
   setSelectedFund: (fund: Fund | null) => void;
   setInvestmentAmount: (amount: number) => void;
@@ -22,6 +22,9 @@ interface AppContextType extends AppState {
   setInvestmentSuccess: (success: boolean) => void;
   dismissPrompt: (promptType: string) => void;
   updateUser: (updates: Partial<User>) => void;
+  addSupportMessage: (message: SupportMessage) => void;
+  markMessageAsRead: (messageId: string) => void;
+  markAllMessagesAsRead: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -52,7 +55,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     riskComfort: '',
   });
   const [investmentPreferences, setInvestmentPreferences] = useState<string[]>([]);
-  const [bankVerificationStatus, setBankVerificationStatus] = useState<'pending' | 'success' | 'failed'>('pending');
+  const [bankVerificationStatus, setBankVerificationStatus] = useState<'pending' | 'success' | 'failed' | 'manual-review'>('pending');
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
     fullName: '',
     idNumber: '',
@@ -71,6 +74,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [selectedTab, setSelectedTab] = useState('dashboard');
   const [dismissedPrompts, setDismissedPrompts] = useState<string[]>([]);
   const [lastPromptDismissTime, setLastPromptDismissTime] = useState<Record<string, number>>({});
+  const [supportMessages, setSupportMessages] = useState<SupportMessage[]>([]);
+  const [unreadMessages, setUnreadMessages] = useState(0);
 
   useEffect(() => {
     const stored = localStorage.getItem('dismissedPrompts');
@@ -104,6 +109,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const addSupportMessage = (message: SupportMessage) => {
+    setSupportMessages((prev) => [...prev, message]);
+    if (!message.read) {
+      setUnreadMessages((prev) => prev + 1);
+    }
+  };
+
+  const markMessageAsRead = (messageId: string) => {
+    setSupportMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === messageId ? { ...msg, read: true } : msg
+      )
+    );
+    setUnreadMessages((prev) => Math.max(0, prev - 1));
+  };
+
+  const markAllMessagesAsRead = () => {
+    setSupportMessages((prev) =>
+      prev.map((msg) => ({ ...msg, read: true }))
+    );
+    setUnreadMessages(0);
+  };
+
   const value: AppContextType = {
     user,
     userLoggedIn: !!user,
@@ -128,6 +156,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     selectedTab,
     dismissedPrompts,
     lastPromptDismissTime,
+    supportMessages,
+    unreadMessages,
     setUser,
     setWalletBalance,
     setHasInvested,
@@ -148,6 +178,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setInvestmentSuccess,
     dismissPrompt,
     updateUser,
+    addSupportMessage,
+    markMessageAsRead,
+    markAllMessagesAsRead,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

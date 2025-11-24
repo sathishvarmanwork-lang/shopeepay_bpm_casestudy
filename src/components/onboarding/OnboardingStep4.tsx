@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { Building2, CheckCircle, AlertCircle, Loader2, Camera } from 'lucide-react';
+import { Building2, CheckCircle, AlertCircle, Loader2, Camera, MessageSquare, Clock } from 'lucide-react';
 
 interface Props {
   onNext: () => void;
@@ -8,11 +8,12 @@ interface Props {
 }
 
 const OnboardingStep4: React.FC<Props> = ({ onNext, onBack }) => {
-  const { bankVerificationStatus, setBankVerificationStatus, setPersonalInfo } = useAppContext();
-  const [stage, setStage] = useState<'selection' | 'authenticating' | 'processing' | 'success' | 'failed' | 'photo-upload'>('selection');
+  const { bankVerificationStatus, setBankVerificationStatus, setPersonalInfo, addSupportMessage, unreadMessages, supportMessages, markAllMessagesAsRead } = useAppContext();
+  const [stage, setStage] = useState<'selection' | 'authenticating' | 'processing' | 'success' | 'failed' | 'manual-review' | 'photo-upload'>('selection');
   const [selectedBank, setSelectedBank] = useState('');
   const [frontPhoto, setFrontPhoto] = useState(false);
   const [backPhoto, setBackPhoto] = useState(false);
+  const [showMessages, setShowMessages] = useState(false);
 
   const banks = [
     'Maybank',
@@ -35,8 +36,19 @@ const OnboardingStep4: React.FC<Props> = ({ onNext, onBack }) => {
     setTimeout(() => {
       setStage('processing');
       setTimeout(() => {
-        const success = Math.random() > 0.3;
-        if (success) {
+        if (selectedBank === 'UOB Malaysia') {
+          setStage('manual-review');
+          setBankVerificationStatus('manual-review');
+          setTimeout(() => {
+            addSupportMessage({
+              id: `msg-${Date.now()}`,
+              message: "Hi! Our verification team is reviewing your UOB bank details. We'll update you within 30 minutes. You can continue using other ShopeePay features in the meantime.",
+              timestamp: new Date().toISOString(),
+              read: false,
+              type: 'verification',
+            });
+          }, 3000);
+        } else {
           setStage('success');
           setBankVerificationStatus('success');
           setPersonalInfo({
@@ -47,9 +59,6 @@ const OnboardingStep4: React.FC<Props> = ({ onNext, onBack }) => {
             email: 'user@example.com',
             phone: '+60123456789',
           });
-        } else {
-          setStage('failed');
-          setBankVerificationStatus('failed');
         }
       }, 2000);
     }, 1500);
@@ -77,6 +86,54 @@ const OnboardingStep4: React.FC<Props> = ({ onNext, onBack }) => {
       });
     }
   };
+
+  const handleViewMessages = () => {
+    markAllMessagesAsRead();
+    setShowMessages(true);
+  };
+
+  if (showMessages) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-gray-900">Support Messages</h2>
+            <button
+              onClick={() => setShowMessages(false)}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="space-y-3">
+            {supportMessages.map((msg) => (
+              <div key={msg.id} className="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-500">
+                <div className="flex items-start gap-3">
+                  <MessageSquare className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-900 mb-2">{msg.message}</p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(msg.timestamp).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {supportMessages.length === 0 && (
+              <p className="text-center text-gray-500 py-8">No messages yet</p>
+            )}
+          </div>
+          <button
+            onClick={() => setShowMessages(false)}
+            className="w-full mt-6 bg-[#EE4D2D] text-white py-3 rounded-lg font-semibold hover:bg-[#D43D1D] transition-colors"
+            style={{ minHeight: '44px' }}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (stage === 'authenticating') {
     return (
@@ -150,6 +207,66 @@ const OnboardingStep4: React.FC<Props> = ({ onNext, onBack }) => {
     );
   }
 
+  if (stage === 'manual-review') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-xl p-8">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-100 rounded-full mb-4 mx-auto">
+            <Clock className="w-12 h-12 text-blue-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">Manual Review in Progress</h2>
+          <p className="text-gray-600 mb-4 text-center">Your verification with {selectedBank} requires additional review by our team.</p>
+
+          <div className="bg-blue-50 rounded-lg p-4 mb-6">
+            <p className="text-sm font-medium text-gray-900 mb-3">What happens next:</p>
+            <ul className="text-sm text-gray-700 space-y-2">
+              <li className="flex items-start gap-2">
+                <CheckCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                <span>Our team is reviewing your bank verification details</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                <span>You'll receive an in-app message with updates</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                <span>Review typically completes within 30 minutes</span>
+              </li>
+            </ul>
+          </div>
+
+          {unreadMessages > 0 && (
+            <button
+              onClick={handleViewMessages}
+              className="w-full bg-orange-50 border-2 border-[#EE4D2D] text-gray-900 py-3 rounded-lg font-semibold hover:bg-orange-100 transition-colors mb-3 flex items-center justify-center gap-2"
+              style={{ minHeight: '44px' }}
+            >
+              <MessageSquare className="w-5 h-5 text-[#EE4D2D]" />
+              View Message from Support Team
+              <span className="inline-flex items-center justify-center w-6 h-6 bg-[#EE4D2D] text-white text-xs rounded-full">
+                {unreadMessages}
+              </span>
+            </button>
+          )}
+
+          <div className="space-y-3">
+            <button
+              onClick={handleUseAlternative}
+              className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+              style={{ minHeight: '44px' }}
+            >
+              Use Alternative Verification Method
+            </button>
+          </div>
+
+          <div className="mt-6 text-center">
+            <p className="text-xs text-gray-500">You can continue using other ShopeePay features while we review your verification.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (stage === 'failed') {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -179,11 +296,8 @@ const OnboardingStep4: React.FC<Props> = ({ onNext, onBack }) => {
             >
               Verify with ID Photos Instead
             </button>
-            <button className="w-full text-sm text-gray-500 hover:text-gray-700 py-2">
-              Contact Support
-            </button>
           </div>
-          <p className="text-xs text-gray-500 text-center mt-4">Our team will reach out within 30 minutes</p>
+          <p className="text-xs text-gray-500 text-center mt-4">Having issues? Our team will reach out within 30 minutes</p>
         </div>
       </div>
     );

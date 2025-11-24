@@ -59,6 +59,14 @@ export interface Fund {
   withdrawalTimeline: string;
 }
 
+export interface SupportMessage {
+  id: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+  type: 'verification' | 'general';
+}
+
 export interface AppState {
   user: User | null;
   userLoggedIn: boolean;
@@ -73,7 +81,7 @@ export interface AppState {
   onboardingStep: number;
   riskProfile: RiskProfile;
   investmentPreferences: string[];
-  bankVerificationStatus: 'pending' | 'success' | 'failed';
+  bankVerificationStatus: 'pending' | 'success' | 'failed' | 'manual-review';
   personalInfo: PersonalInfo;
   selectedFund: Fund | null;
   investmentAmount: number;
@@ -83,4 +91,6 @@ export interface AppState {
   selectedTab: string;
   dismissedPrompts: string[];
   lastPromptDismissTime: Record<string, number>;
+  supportMessages: SupportMessage[];
+  unreadMessages: number;
 }
