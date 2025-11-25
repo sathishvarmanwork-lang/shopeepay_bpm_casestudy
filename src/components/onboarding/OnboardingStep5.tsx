@@ -22,17 +22,17 @@ const OnboardingStep5: React.FC<Props> = ({ onNext, onBack }) => {
 
   const handleSubmit = () => {
     setPersonalInfo(formData);
+    setOnboardingComplete(true);
+    setEkycComplete(true);
+    updateUser({
+      onboardingComplete: true,
+      ekycComplete: true,
+    });
     setShowSuccess(true);
+  };
 
-    setTimeout(() => {
-      setOnboardingComplete(true);
-      setEkycComplete(true);
-      updateUser({
-        onboardingComplete: true,
-        ekycComplete: true,
-      });
-      navigate('/invest-products');
-    }, 2000);
+  const handleContinueToInvest = () => {
+    navigate('/invest-products');
   };
 
   const isValid =
@@ -53,10 +53,18 @@ const OnboardingStep5: React.FC<Props> = ({ onNext, onBack }) => {
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">You're All Set!</h2>
           <p className="text-gray-600 mb-4">Your investment account is ready to use</p>
-          <p className="text-[#EE4D2D] font-semibold mb-6">Enjoy RM1 trial credit on your first investment</p>
-          <div className="flex justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#EE4D2D]"></div>
+          <div className="bg-orange-50 rounded-lg p-4 mb-6 border-l-4 border-[#EE4D2D]">
+            <p className="text-[#EE4D2D] font-bold text-lg">RM1 Trial Credit</p>
+            <p className="text-sm text-gray-700 mt-1">Free credit on your first investment</p>
           </div>
+          <button
+            onClick={handleContinueToInvest}
+            className="w-full bg-[#EE4D2D] text-white py-3 rounded-lg font-semibold hover:bg-[#D43D1D] transition-colors"
+            style={{ minHeight: '44px' }}
+          >
+            Start Investing Now
+          </button>
+          <p className="text-xs text-gray-500 mt-4">Explore funds and start growing your money</p>
         </div>
       </div>
     );
