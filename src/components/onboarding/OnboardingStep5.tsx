@@ -12,7 +12,21 @@ const OnboardingStep5: React.FC<Props> = ({ onNext, onBack }) => {
   const navigate = useNavigate();
   const { personalInfo, setPersonalInfo, setOnboardingComplete, setEkycComplete, updateUser } = useAppContext();
 
-  const [formData, setFormData] = useState(personalInfo);
+  const [formData, setFormData] = useState(() => {
+    if (!personalInfo.fullName && !personalInfo.email) {
+      return {
+        fullName: 'Demo User',
+        idNumber: '****1234',
+        dateOfBirth: '1990-01-15',
+        address: '123 Jalan Example, Kuala Lumpur',
+        email: 'user@example.com',
+        phone: '+60123456789',
+        occupation: '',
+        annualIncome: '',
+      };
+    }
+    return personalInfo;
+  });
   const [confirmed, setConfirmed] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -29,6 +43,10 @@ const OnboardingStep5: React.FC<Props> = ({ onNext, onBack }) => {
       ekycComplete: true,
     });
     setShowSuccess(true);
+
+    setTimeout(() => {
+      navigate('/invest-products');
+    }, 3000);
   };
 
   const handleContinueToInvest = () => {
