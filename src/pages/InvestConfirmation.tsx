@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { ArrowLeft, Shield, Info, MessageCircle } from 'lucide-react';
+import ExitConfirmationModal from '../components/ExitConfirmationModal';
 
 const InvestConfirmation: React.FC = () => {
   const navigate = useNavigate();
@@ -11,6 +12,8 @@ const InvestConfirmation: React.FC = () => {
   const { selectedFund, investmentAmount, walletBalance, confirmedCheckboxes, setConfirmedCheckboxes } =
     useAppContext();
   const [checkboxes, setCheckboxes] = useState<boolean[]>(confirmedCheckboxes);
+  const [showExitModal, setShowExitModal] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
 
   if (!selectedFund) {
     navigate('/invest-products');
@@ -34,12 +37,42 @@ const InvestConfirmation: React.FC = () => {
     navigate('/invest-processing');
   };
 
+  const handleBackClick = (destination: string) => {
+    setPendingNavigation(destination);
+    setShowExitModal(true);
+  };
+
+  const handleContinueInvestment = () => {
+    setShowExitModal(false);
+    setPendingNavigation(null);
+  };
+
+  const handleLearnMore = () => {
+    setShowExitModal(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleLeaveAnyway = () => {
+    setShowExitModal(false);
+    if (pendingNavigation) {
+      navigate(pendingNavigation);
+    }
+  };
+
   if (!isFinal) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <>
+        <ExitConfirmationModal
+          isOpen={showExitModal}
+          onClose={() => setShowExitModal(false)}
+          onRestart={handleContinueInvestment}
+          onLearnMore={handleLearnMore}
+          onLeaveAnyway={handleLeaveAnyway}
+        />
+        <div className="min-h-screen bg-gray-50">
         <header className="bg-white border-b border-gray-200 px-4 py-4 sticky top-0 z-10">
           <div className="flex items-center max-w-md mx-auto">
-            <button onClick={() => navigate('/invest-products')} className="mr-4">
+            <button onClick={() => handleBackClick('/invest-products')} className="mr-4">
               <ArrowLeft className="w-6 h-6 text-gray-700" />
             </button>
             <h1 className="text-lg font-semibold text-gray-900">Ready to Invest</h1>
@@ -157,7 +190,7 @@ const InvestConfirmation: React.FC = () => {
               Proceed to Confirmation
             </button>
             <button
-              onClick={() => navigate('/invest-products')}
+              onClick={() => handleBackClick('/invest-products')}
               className="w-full text-gray-600 py-2 text-sm hover:text-gray-900"
             >
               Learn More / Change Amount
@@ -165,14 +198,23 @@ const InvestConfirmation: React.FC = () => {
           </div>
         </div>
       </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      <ExitConfirmationModal
+        isOpen={showExitModal}
+        onClose={() => setShowExitModal(false)}
+        onRestart={handleContinueInvestment}
+        onLearnMore={handleLearnMore}
+        onLeaveAnyway={handleLeaveAnyway}
+      />
+      <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 px-4 py-4 sticky top-0 z-10">
         <div className="flex items-center max-w-md mx-auto">
-          <button onClick={() => navigate('/invest-confirmation')} className="mr-4">
+          <button onClick={() => handleBackClick('/invest-confirmation')} className="mr-4">
             <ArrowLeft className="w-6 h-6 text-gray-700" />
           </button>
           <h1 className="text-lg font-semibold text-gray-900">Confirm Your Investment</h1>
@@ -302,7 +344,7 @@ const InvestConfirmation: React.FC = () => {
             Confirm & Invest
           </button>
           <div className="flex justify-center gap-4 text-sm">
-            <button onClick={() => navigate('/invest-confirmation')} className="text-gray-600 hover:text-gray-900">
+            <button onClick={() => handleBackClick('/invest-confirmation')} className="text-gray-600 hover:text-gray-900">
               Back / Change Amount
             </button>
             <button className="text-gray-600 hover:text-gray-900 flex items-center gap-1">
@@ -313,6 +355,7 @@ const InvestConfirmation: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
