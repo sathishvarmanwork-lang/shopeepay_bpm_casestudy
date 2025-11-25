@@ -10,7 +10,7 @@ interface Props {
 
 const OnboardingStep5: React.FC<Props> = ({ onNext, onBack }) => {
   const navigate = useNavigate();
-  const { personalInfo, setPersonalInfo, setOnboardingComplete, setEkycComplete, updateUser } = useAppContext();
+  const { personalInfo, setPersonalInfo, updateUser } = useAppContext();
 
   const [formData, setFormData] = useState(() => {
     if (!personalInfo.fullName && !personalInfo.email) {
@@ -36,8 +36,6 @@ const OnboardingStep5: React.FC<Props> = ({ onNext, onBack }) => {
 
   const handleSubmit = () => {
     setPersonalInfo(formData);
-    setOnboardingComplete(true);
-    setEkycComplete(true);
     updateUser({
       onboardingComplete: true,
       ekycComplete: true,
